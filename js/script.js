@@ -67,6 +67,10 @@ const MEMORIES = [
   "Il y a des repas qu'on n'oublie pas",
   "Il y a des soirées films qu'on n'oublie pas",
   "Il y a des randonnées qu'on n'oublie pas",
+  "Il y a des restaurants qu'on n'oublie pas",
+  "Il y a des anniversaires qu'on n'oublie pas",
+  "Il y a des matinées sous la couhette qu'on n'oublie pas",
+  "Il y a des concerts qu'on n'oublie pas"
 ];
 
 const PHOTOS = [
