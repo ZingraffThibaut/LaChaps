@@ -60,11 +60,12 @@ const Fireworks = (() => {
       nextLaunch = time + rand(LAUNCH_MIN, LAUNCH_MAX);
     }
 
-    // Voile noir semi-transparent : laisse des traînées derrière chaque point
-    ctx.globalCompositeOperation = "source-over";
+    // Efface en partie l'image précédente : laisse des traînées derrière chaque point,
+    // tout en gardant le canvas transparent pour voir le ciel derrière
+    ctx.globalCompositeOperation = "destination-out";
     ctx.fillStyle = "rgba(0, 0, 0, 0.18)";
     ctx.fillRect(0, 0, width, height);
-    ctx.globalCompositeOperation = "lighter";
+    ctx.globalCompositeOperation = "source-over";
 
     rockets = rockets.filter((r) => {
       r.vy += GRAVITY_ROCKET * dt;

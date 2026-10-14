@@ -68,11 +68,12 @@ body {
   color: #000;
 }
 
-/* Écran noir : part de la forme du bouton (clip-path posé en JS) et s'étend à tout l'écran */
+/* Ciel : part de la forme du bouton (clip-path posé en JS) et s'étend à tout l'écran.
+   Ses couleurs suivent la musique (jour → jaune → rose → nuit), mises à jour en JS. */
 .night {
   position: fixed;
   inset: 0;
-  background: #000;
+  background: linear-gradient(to bottom, var(--sky-top, #4fa3e0), var(--sky-bottom, #a8d8f0));
   visibility: hidden;
   transition: clip-path 1.2s cubic-bezier(0.65, 0, 0.35, 1);
 }
@@ -83,9 +84,92 @@ body {
 }
 
 #fireworks {
+  position: absolute;
+  inset: 0;
   display: block;
   width: 100%;
   height: 100%;
+}
+
+/* Soleil : couleur et position (arc) mises à jour en JS au fil de la musique */
+.sun {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: min(14vw, 14vh, 140px);
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: var(--sun-color, #f9a825);
+  box-shadow: 0 0 60px 10px var(--sun-color, #f9a825);
+  transform: translate(-200px, -200px);
+  pointer-events: none;
+}
+
+/* Montagnes posées devant le feu d'artifice : les fusées semblent partir de derrière */
+.mountains {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  display: block;
+  width: 100%;
+  height: 25vh;
+  pointer-events: none;
+}
+
+.mountains .far {
+  fill: rgba(255, 255, 255, 0.35);
+}
+
+.mountains .near {
+  fill: #fff;
+}
+
+/* Personnages en noir, posés sur le plateau blanc au centre des montagnes */
+.family {
+  position: absolute;
+  left: 50%;
+  bottom: 0.5vh;
+  display: block;
+  height: 11vh;
+  aspect-ratio: 160 / 120;
+  transform: translateX(-50%);
+  fill: #000;
+  pointer-events: none;
+}
+
+.family .limbs {
+  fill: none;
+  stroke: #000;
+  stroke-width: 5;
+  stroke-linecap: round;
+}
+
+/* Baleine posée juste au-dessus des montagnes, côté gauche */
+.whale {
+  position: absolute;
+  left: 4vw;
+  bottom: 26vh;
+  display: block;
+  width: min(30vw, 320px);
+  aspect-ratio: 2 / 1;
+  fill: #fff;
+  pointer-events: none;
+}
+
+.whale .eye {
+  fill: #000;
+}
+
+/* Palmier collé au bord droit : le tronc semble sortir de l'écran */
+.palm {
+  position: absolute;
+  top: 4vh;
+  right: 0;
+  display: block;
+  width: min(26vw, 260px);
+  aspect-ratio: 220 / 200;
+  fill: #fff;
+  pointer-events: none;
 }
 
 /* Phrases qui apparaissent une à une, à une position aléatoire posée en JS */
@@ -95,7 +179,7 @@ body {
   color: #fff;
   font-size: clamp(1.1rem, 3vw, 1.8rem);
   text-align: center;
-  text-shadow: 0 0 12px rgba(0, 0, 0, 0.9);
+  text-shadow: 0 1px 6px rgba(0, 0, 0, 0.35);
   pointer-events: none;
   opacity: 0;
   transform: translateY(8px);
@@ -110,8 +194,6 @@ body {
 /* Photo façon tirage papier posé sur la table : bord blanc, ombre, légèrement penchée (--tilt posé en JS) */
 .photo {
   position: absolute;
-  max-width: min(260px, 38vw);
-  max-height: min(300px, 38vh);
   padding: 8px 8px 28px;
   background: #fff;
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6);
@@ -124,4 +206,66 @@ body {
 .photo.visible {
   opacity: 1;
   transform: rotate(var(--tilt, 0deg)) scale(1);
+}
+
+/* Message final, centré, écrit à la machine comme le début */
+.finale {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1.5rem;
+  padding: 0 1rem;
+  color: #fff;
+  text-align: center;
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.35);
+  pointer-events: none;
+  visibility: hidden;
+}
+
+.finale.visible {
+  visibility: visible;
+}
+
+.finale-title {
+  font-size: clamp(1.75rem, 5vw, 4rem);
+  font-weight: normal;
+}
+
+/* Compte à rebours, apparaît en fondu une fois le message écrit */
+.countdown {
+  font-size: clamp(1.1rem, 3vw, 2rem);
+  opacity: 0;
+  transition: opacity 1.2s ease;
+}
+
+.countdown.visible {
+  opacity: 1;
+}
+
+/* Bouton discret en haut à gauche pour sauter au final */
+.skip-btn {
+  position: absolute;
+  top: 1rem;
+  left: 1rem;
+  font: inherit;
+  font-size: 0.9rem;
+  padding: 0.4rem 1rem;
+  color: #fff;
+  background: rgba(0, 0, 0, 0.25);
+  border: 1px solid rgba(255, 255, 255, 0.6);
+  border-radius: 999px;
+  cursor: pointer;
+  transition: opacity 0.6s ease, background 0.2s;
+}
+
+.skip-btn:hover {
+  background: rgba(0, 0, 0, 0.45);
+}
+
+.skip-btn.hidden {
+  opacity: 0;
+  pointer-events: none;
 }
