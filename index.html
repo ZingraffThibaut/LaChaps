@@ -9,7 +9,13 @@
 <body>
   <main class="scene">
     <h1 class="typewriter"><span id="typed"></span><span class="cursor">|</span></h1>
-    <button id="open-btn" class="open-btn" type="button">Ouvrir</button>
+    <!-- Enveloppe : le rabat s'ouvre au survol, la lettre (couleur du ciel) en sort au clic -->
+    <button id="open-btn" class="open-btn" type="button" aria-label="Ouvrir">
+      <span class="env-back"></span>
+      <span id="env-letter" class="env-letter"></span>
+      <span class="env-pocket"></span>
+      <span class="env-flap"></span>
+    </button>
   </main>
 
   <!-- Ciel qui s'étend depuis le bouton, avec le feu d'artifice et le décor -->

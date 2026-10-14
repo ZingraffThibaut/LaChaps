@@ -5,6 +5,7 @@ const START_DELAY = 1500;  // le curseur clignote seul avant de commencer à éc
 const PAUSE_BEFORE_ERASE = 3000; // temps d'affichage du premier texte (ms)
 const PAUSE_AFTER_ERASE = 600;   // petite pause, ligne vide, avant la phrase suivante (ms)
 const BUTTON_DELAY = 800;  // délai entre la fin de la phrase et l'apparition du bouton (ms)
+const LETTER_OUT_DURATION = 700; // temps pour que la lettre sorte de l'enveloppe avant que le ciel s'étende (ms)
 
 const MIN_SPEED = 90;      // délai minimum entre deux lettres (ms)
 const MAX_SPEED = 220;     // délai maximum, pour un rythme de frappe naturel
@@ -12,6 +13,7 @@ const ERASE_SPEED = 70;    // vitesse d'effacement, un peu plus rapide et régul
 
 const typed = document.getElementById("typed");
 const openBtn = document.getElementById("open-btn");
+const envLetter = document.getElementById("env-letter");
 
 const wait = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 const typingDelay = () => MIN_SPEED + Math.random() * (MAX_SPEED - MIN_SPEED);
@@ -316,19 +318,23 @@ function startSky() {
   update();
 }
 
-openBtn.addEventListener("click", () => {
+openBtn.addEventListener("click", async () => {
   openBtn.disabled = true;
 
   // Lancée pendant le clic : les navigateurs bloquent le son qui ne démarre pas suite à une action de l'utilisateur
   song.play().catch(() => {});
 
-  // Le ciel démarre exactement à la forme du bouton...
-  const r = openBtn.getBoundingClientRect();
+  // Le rabat s'ouvre (utile sur téléphone, sans survol) et la lettre sort de l'enveloppe
+  openBtn.classList.add("opening");
+  await wait(LETTER_OUT_DURATION);
+
+  // Le ciel démarre exactement à la forme de la lettre sortie...
+  const r = envLetter.getBoundingClientRect();
   const top = r.top;
   const right = window.innerWidth - r.right;
   const bottom = window.innerHeight - r.bottom;
   const left = r.left;
-  night.style.clipPath = `inset(${top}px ${right}px ${bottom}px ${left}px round ${r.height / 2}px)`;
+  night.style.clipPath = `inset(${top}px ${right}px ${bottom}px ${left}px round 3px)`;
   night.style.visibility = "visible";
 
   // ...puis s'étend jusqu'aux bords de l'écran (on force un reflow pour que la transition parte bien de là)
