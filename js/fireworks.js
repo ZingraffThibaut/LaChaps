@@ -13,6 +13,7 @@ const Fireworks = (() => {
   let sparks = [];
   let lastTime = 0;
   let nextLaunch = 0;
+  let sky = { h: 205, s: 70, l: 59 }; // ciel de départ (bleu), remplacé par setSkyColor
 
   const rand = (min, max) => min + Math.random() * (max - min);
 
@@ -30,7 +31,20 @@ const Fireworks = (() => {
     const targetY = rand(height * 0.12, height * 0.5);
     // Vitesse initiale calculée pour que la fusée s'arrête pile à la hauteur visée
     const vy = -Math.sqrt(2 * GRAVITY_ROCKET * (height - targetY));
-    rockets.push({ x, y: height, vx: rand(-20, 20), vy, hue: rand(0, 360) });
+    // Même teinte que le ciel, en plus clair ou plus foncé pour rester visible :
+    // ciel sombre → toujours plus clair, ciel très clair → toujours plus foncé
+    const canLighten = sky.l < 70;
+    const canDarken = sky.l > 35;
+    const lighter = canLighten && (!canDarken || Math.random() < 0.5);
+    const light = lighter
+      ? sky.l + (100 - sky.l) * rand(0.45, 0.75)
+      : sky.l * rand(0.35, 0.6);
+    rockets.push({
+      x, y: height, vx: rand(-20, 20), vy,
+      hue: sky.h + rand(-10, 10),
+      sat: Math.min(100, sky.s + 10),
+      light,
+    });
   }
 
   function explode(rocket) {
@@ -44,7 +58,9 @@ const Fireworks = (() => {
         y: rocket.y,
         vx: Math.cos(angle) * speed,
         vy: Math.sin(angle) * speed,
-        hue: rocket.hue + rand(-20, 20),
+        hue: rocket.hue + rand(-8, 8),
+        sat: rocket.sat,
+        light: Math.min(97, Math.max(5, rocket.light + rand(-8, 8))),
         life,
         maxLife: life,
       });
@@ -75,7 +91,7 @@ const Fireworks = (() => {
         explode(r);
         return false;
       }
-      ctx.fillStyle = `hsl(${r.hue}, 100%, 75%)`;
+      ctx.fillStyle = `hsl(${r.hue}, ${r.sat}%, ${r.light}%)`;
       ctx.beginPath();
       ctx.arc(r.x, r.y, 2, 0, Math.PI * 2);
       ctx.fill();
@@ -91,7 +107,7 @@ const Fireworks = (() => {
       s.x += s.vx * dt;
       s.y += s.vy * dt;
       const alpha = s.life / s.maxLife;
-      ctx.fillStyle = `hsla(${s.hue}, 100%, 65%, ${alpha})`;
+      ctx.fillStyle = `hsla(${s.hue}, ${s.sat}%, ${s.light}%, ${alpha})`;
       ctx.beginPath();
       ctx.arc(s.x, s.y, 1.8, 0, Math.PI * 2);
       ctx.fill();
@@ -111,5 +127,23 @@ const Fireworks = (() => {
     requestAnimationFrame(frame);
   }
 
-  return { start };
+  // Couleur actuelle du ciel, à donner en rouge/vert/bleu (0-255) ; stockée en teinte/saturation/luminosité
+  function setSkyColor([r, g, b]) {
+    const [rn, gn, bn] = [r / 255, g / 255, b / 255];
+    const max = Math.max(rn, gn, bn);
+    const min = Math.min(rn, gn, bn);
+    const l = (max + min) / 2;
+    const d = max - min;
+    let h = 0;
+    let s = 0;
+    if (d > 0) {
+      s = d / (1 - Math.abs(2 * l - 1));
+      if (max === rn) h = 60 * (((gn - bn) / d) % 6);
+      else if (max === gn) h = 60 * ((bn - rn) / d + 2);
+      else h = 60 * ((rn - gn) / d + 4);
+    }
+    sky = { h: (h + 360) % 360, s: s * 100, l: l * 100 };
+  }
+
+  return { start, setSkyColor };
 })();

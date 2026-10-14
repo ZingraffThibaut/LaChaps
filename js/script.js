@@ -71,7 +71,7 @@ const MEMORIES = [
   "Il y a des randonnées qu'on n'oublie pas",
   "Il y a des restaurants qu'on n'oublie pas",
   "Il y a des anniversaires qu'on n'oublie pas",
-  "Il y a des matinées sous la couhette qu'on n'oublie pas",
+  "Il y a des matinées sous la couette qu'on n'oublie pas",
   "Il y a des concerts qu'on n'oublie pas"
 ];
 
@@ -83,9 +83,9 @@ const PHOTOS = [
 ].map((name) => `images/${name}`);
 
 const MEMORY_START_DELAY = 1500; // après l'ouverture du ciel, avant la première phrase (ms)
-const MEMORY_FADE = 1200;        // doit correspondre à la transition .memory / .photo du CSS (ms)
-const MEMORY_HOLD = 3500;        // temps d'affichage de chaque phrase (ms)
-const MEMORY_GAP = 600;          // écran sans texte entre deux phrases (ms)
+const MEMORY_FADE = 800;         // doit correspondre à la transition .memory / .photo du CSS (ms)
+const MEMORY_HOLD = 3200;        // temps d'affichage de chaque phrase (ms)
+const MEMORY_GAP = 200;          // écran sans texte entre deux phrases (ms)
 const SCREEN_MARGIN = 24;        // distance minimale entre un élément et le bord de sa zone (px)
 const TILT_MIN = 3;              // inclinaison des photos, à gauche ou à droite (degrés)
 const TILT_MAX = 10;
@@ -103,7 +103,7 @@ const SKY_STOPS = [
 ];
 const SUN_HIGHEST = 0.15;        // point le plus haut de l'arc du soleil (part de la hauteur de l'écran)
 
-const FINALE_TEXT = "Joyeux anniversaire mon chat";
+const FINALE_TEXT = "Joyeux anniversaire mon chat\nJe t'aime ❤️"; // \n = retour à la ligne
 const FINALE_BEFORE_END = 30;    // le final commence quand il reste ce nombre de secondes de musique
 const COUNTDOWN_TARGET = new Date(2026, 9, 17, 18, 11); // samedi 17 octobre 2026, 18h11 (les mois commencent à 0)
 const COUNTDOWN_DONE_TEXT = "C'est l'heure !";
@@ -279,11 +279,13 @@ async function showMemories() {
 }
 
 // Mélange deux couleurs "#rrggbb" : t = 0 donne a, t = 1 donne b
-function mixColors(a, b, t) {
+function mixRgb(a, b, t) {
   const channel = (hex, i) => parseInt(hex.slice(1 + i * 2, 3 + i * 2), 16);
-  const rgb = [0, 1, 2].map((i) => Math.round(channel(a, i) + (channel(b, i) - channel(a, i)) * t));
-  return `rgb(${rgb.join(", ")})`;
+  return [0, 1, 2].map((i) => Math.round(channel(a, i) + (channel(b, i) - channel(a, i)) * t));
 }
+
+const mixColors = (a, b, t) => `rgb(${mixRgb(a, b, t).join(", ")})`;
+const toHex = (rgb) => `#${rgb.map((c) => c.toString(16).padStart(2, "0")).join("")}`;
 
 // Le soleil se lève derrière les montagnes à gauche, monte en arc et se couche à droite
 function placeSun(p) {
@@ -312,6 +314,10 @@ function startSky() {
     night.style.setProperty("--sky-top", mixColors(from.top, to.top, t));
     night.style.setProperty("--sky-bottom", mixColors(from.bottom, to.bottom, t));
     night.style.setProperty("--sun-color", mixColors(from.sun, to.sun, t));
+    // Le feu d'artifice explose surtout dans le haut du ciel : on lui donne la couleur de cette zone
+    const skyTop = toHex(mixRgb(from.top, to.top, t));
+    const skyBottom = toHex(mixRgb(from.bottom, to.bottom, t));
+    Fireworks.setSkyColor(mixRgb(skyTop, skyBottom, 0.3));
     placeSun(p);
     if (p < 1) requestAnimationFrame(update);
   }

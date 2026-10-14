@@ -238,7 +238,7 @@ body {
   pointer-events: none;
   opacity: 0;
   transform: translateY(8px);
-  transition: opacity 1.2s ease, transform 1.2s ease;
+  transition: opacity 0.8s ease, transform 0.8s ease;
 }
 
 .memory.visible {
@@ -255,7 +255,7 @@ body {
   pointer-events: none;
   opacity: 0;
   transform: rotate(var(--tilt, 0deg)) scale(0.92);
-  transition: opacity 1.2s ease, transform 1.2s ease;
+  transition: opacity 0.8s ease, transform 0.8s ease;
 }
 
 .photo.visible {
@@ -287,6 +287,7 @@ body {
 .finale-title {
   font-size: clamp(1.75rem, 5vw, 4rem);
   font-weight: normal;
+  white-space: pre-line; /* respecte le retour à la ligne de FINALE_TEXT */
 }
 
 /* Compte à rebours, apparaît en fondu une fois le message écrit */
